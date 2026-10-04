@@ -1,0 +1,3 @@
+CREATE TYPE "TicketChannel" AS ENUM ('PORTAL', 'WHATSAPP', 'PHONE', 'EMAIL', 'OTHER');
+
+ALTER TABLE "tickets" ADD COLUMN "channel" "TicketChannel" NOT NULL DEFAULT 'PORTAL';

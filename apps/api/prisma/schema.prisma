@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  AGENT
+  TECHNICIAN
+  ADMIN
+}
+
+enum AgentAvailability {
+  AVAILABLE
+  AWAY
+  UNAVAILABLE
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_CUSTOMER
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketCategory {
+  CONNECTION_DOWN
+  SLOW_CONNECTION
+  BILLING
+  EQUIPMENT
+  CONTRACT
+  OTHER
+}
+
+enum TicketChannel {
+  PORTAL
+  WHATSAPP
+  PHONE
+  EMAIL
+  OTHER
+}
+
+enum TicketDepartment {
+  COMMERCIAL
+  FINANCE
+  SUPPORT_N1
+  SUPPORT_N2
+  FIELD
+}
+
+model User {
+  id             String   @id @default(uuid())
+  name           String
+  email          String   @unique
+  phone          String?
+  passwordHash   String
+  role           UserRole @default(CUSTOMER)
+  isActive       Boolean  @default(true)
+  availability   AgentAvailability @default(AVAILABLE)
+  avatarData     String?  @db.Text
+  /// ID do cliente correspondente no IXC Soft (quando vinculado)
+  ixcCustomerId  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  ticketsCreated  Ticket[]       @relation("TicketCustomer")
+  ticketsAssigned Ticket[]       @relation("TicketAssignee")
+  messages        TicketMessage[]
+  departmentTransfers TicketTransfer[] @relation("TicketTransferAuthor")
+  receivedTicketTransfers TicketTransfer[] @relation("TicketTransferRecipient")
+
+  @@map("users")
+}
+
+enum SupportChannelType {
+  WHATSAPP
+  PHONE
+  EMAIL
+  OTHER
+}
+
+model SystemSettings {
+  id                  String   @id @default("global")
+  companyName         String   @default("Canal Direto")
+  supportEmail        String   @default("")
+  supportPhone        String   @default("")
+  timezone            String   @default("America/Recife")
+  passwordMinLength   Int      @default(8)
+  sessionDurationDays Int      @default(7)
+  diagnosticFlow      Json     @default("[]")
+  communicationFlows  Json     @default("[]")
+  channelFlowAssignments Json  @default("{}")
+  updatedAt           DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+model SupportChannel {
+  id        String            @id @default(uuid())
+  name      String
+  type      SupportChannelType
+  address   String
+  enabled   Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@map("support_channels")
+}
+
+model IxcConfiguration {
+  id                  String   @id @default("primary")
+  baseUrl             String
+  encryptedCredential String
+  updatedAt           DateTime @updatedAt
+
+  @@map("ixc_configuration")
+}
+
+model Ticket {
+  id            String         @id @default(uuid())
+  /// Número de protocolo amigável exibido ao cliente (ex: 2024-000123)
+  protocol      String         @unique
+  title         String
+  description   String
+  category      TicketCategory
+  priority      TicketPriority @default(MEDIUM)
+  status        TicketStatus   @default(OPEN)
+  channel       TicketChannel  @default(PORTAL)
+
+  customerId    String
+  customer      User           @relation("TicketCustomer", fields: [customerId], references: [id])
+
+  assignedToId  String?
+  assignedTo    User?          @relation("TicketAssignee", fields: [assignedToId], references: [id])
+  department    TicketDepartment @default(COMMERCIAL)
+
+  /// ID do cliente/contrato no IXC no momento da abertura do ticket
+  ixcCustomerId String?
+  communicationFlowState Json?
+  satisfactionRating Int?
+  satisfactionComment String? @db.Text
+  satisfactionSubmittedAt DateTime?
+
+  messages      TicketMessage[]
+  transfers     TicketTransfer[]
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("tickets")
+}
+
+model TicketTransfer {
+  id                 String           @id @default(uuid())
+  ticketId           String
+  ticket             Ticket           @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  fromDepartment     TicketDepartment
+  toDepartment       TicketDepartment
+  transferredById    String
+  transferredBy      User             @relation("TicketTransferAuthor", fields: [transferredById], references: [id])
+  transferredToId    String?
+  transferredTo      User?            @relation("TicketTransferRecipient", fields: [transferredToId], references: [id], onDelete: SetNull)
+  note               String?
+  createdAt          DateTime         @default(now())
+
+  @@index([ticketId, createdAt])
+  @@map("ticket_transfers")
+}
+
+model TicketMessage {
+  id        String   @id @default(uuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  message   String
+  createdAt DateTime @default(now())
+  attachments TicketAttachment[]
+
+  @@map("ticket_messages")
+}
+
+model TicketAttachment {
+  id          String        @id @default(uuid())
+  messageId   String
+  message     TicketMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  name        String
+  mimeType    String
+  size        Int
+  storageName String        @unique
+  createdAt   DateTime      @default(now())
+
+  @@index([messageId])
+  @@map("ticket_attachments")
+}

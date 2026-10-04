@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Canal Direto",
+    "slug": "canal-direto",
+    "version": "0.1.2",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#1458ff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "plugins": ["./plugins/withAndroidCleartext"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "br.com.canaldireto.app"
+    },
+    "android": {
+      "package": "br.com.canaldireto.app",
+      "usesCleartextTraffic": true
+    },
+    "extra": {
+      "apiUrl": "http://192.168.0.102:3333/api"
+    }
+  }
+}

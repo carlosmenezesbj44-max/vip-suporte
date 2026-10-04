@@ -1,0 +1,46 @@
+# Dependências
+node_modules/
+**/node_modules/
+
+# Builds
+dist/
+build/
+.next/
+**/.next*/
+.expo/
+.expo-shared/
+apps/mobile/output/
+*.tsbuildinfo
+**/android/.gradle/
+**/android/local.properties
+**/android/app/build/
+**/android/build/
+**/.cxx/
+
+# Arquivos locais, chaves e instaladores gerados
+usuario adm
+*.keystore
+*.jks
+*.apk
+!/CanalDireto.apk
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local
+apps/**/.env
+
+# Prisma
+apps/api/prisma/migrations/dev.db
+apps/api/uploads/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Editor / SO
+.DS_Store
+.vscode/*
+!.vscode/extensions.json

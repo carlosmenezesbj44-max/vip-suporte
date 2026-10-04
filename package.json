@@ -1,0 +1,32 @@
+{
+  "name": "canal-direto",
+  "private": true,
+  "version": "0.1.0",
+  "description": "App de atendimento (central de tickets) para provedor de internet, com integracao ao IXC Soft.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run start:dev --workspace=apps/api",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev": "node scripts/dev.js",
+    "dev:mobile": "npm run start --workspace=apps/mobile",
+    "dev:setup": "npm run build:shared && npm run prisma:generate && npm run prisma:migrate:deploy --workspace=apps/api",
+    "build:shared": "npm run build --workspace=packages/shared",
+    "build:api": "npm run build --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "prisma:generate": "npm run prisma:generate --workspace=apps/api",
+    "prisma:migrate": "npm run prisma:migrate --workspace=apps/api"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "allowScripts": {
+    "@nestjs/core@10.4.22": true,
+    "@prisma/client@5.22.0": true,
+    "@prisma/engines@5.22.0": true,
+    "bcrypt@5.1.1": true,
+    "prisma@5.22.0": true
+  }
+}
