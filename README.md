@@ -82,6 +82,33 @@ Para subir os três serviços empacotados em containers, use `docker compose up
 em containers pode ser iniciada com `docker compose --profile development up
 --build`.
 
+## Publicação na Cloudflare
+
+O painel Next.js é publicado em Cloudflare Workers com o adaptador OpenNext.
+Na configuração do Worker conectado ao GitHub, use:
+
+- **Root directory:** `/` (raiz do monorepo, onde está o `package-lock.json`).
+- **Build command:** deixe vazio.
+- **Deploy command:** `npm run deploy --workspace=apps/web`.
+- **Build variable:** `NEXT_PUBLIC_API_URL=https://api.seu-dominio.com/api`.
+
+O comando de deploy compila o pacote compartilhado e o painel para Workers. O
+endereço da API é incorporado no painel durante a compilação; o script valida
+que seja HTTPS e público para evitar publicar links para `localhost`.
+
+Este Worker publica somente o painel web. A API NestJS e o PostgreSQL precisam
+de uma implantação própria. A API requer Node.js em container e PostgreSQL
+acessível pela internet; ela pode ficar em um host Node ou em Cloudflare
+Containers (plano Workers Paid), que exige um Worker de roteamento adicional.
+Configure na API `DATABASE_URL`, `JWT_SECRET`, `SETTINGS_ENCRYPTION_KEY`,
+`IXC_API_URL`, `IXC_API_TOKEN` e `PORT`. Anexos hoje são gravados no disco local
+da API (`UPLOAD_DIR`); em hospedagem com disco efêmero, mova-os para armazenamento
+persistente, como Cloudflare R2, antes de depender deles em produção.
+
+Para o app móvel acessar o serviço em qualquer rede, configure `EXPO_PUBLIC_API_URL`
+com o mesmo endereço público da API e gere um APK novo. O APK atualmente
+configurado no projeto ainda aponta para o IP local `192.168.0.102`.
+
 ## Papéis de usuário
 
 - `CUSTOMER`: abre chamados e acompanha o próprio histórico.

@@ -7,6 +7,10 @@ dist/
 build/
 .next/
 **/.next*/
+.open-next/
+**/.open-next/
+.wrangler/
+**/.wrangler/
 .expo/
 .expo-shared/
 apps/mobile/output/

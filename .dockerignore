@@ -1,0 +1,27 @@
+.git
+.github
+node_modules
+**/node_modules
+**/.next
+**/.open-next
+**/.wrangler
+**/dist
+**/build
+**/.expo
+**/.expo-shared
+**/android/.gradle
+**/android/app/build
+**/android/build
+**/.env
+**/.env.*
+**/*.keystore
+**/*.jks
+**/*.apk
+**/uploads
+apps/web/*
+!apps/web/package.json
+apps/mobile/*
+!apps/mobile/package.json
+apps/CanalDireto.apk
+CanalDireto.apk
+usuario adm
