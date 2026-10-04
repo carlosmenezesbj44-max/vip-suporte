@@ -11,7 +11,7 @@
   "dependencies": {
     "@canal-direto/shared": "0.1.0",
     "axios": "^1.6.8",
-    "next": "14.2.3",
+    "next": "14.2.35",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "socket.io-client": "^4.7.5"
